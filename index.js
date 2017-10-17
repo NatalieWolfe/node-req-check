@@ -122,7 +122,7 @@ function _setDefaults(opts, defaults) {
 }
 
 function _getParams(req) {
-  return (/^get$/i.test(req.method) ? req.query : req.body) || {};
+  return (/^(?:get|delete)$/i.test(req.method) ? req.query : req.body) || {};
 }
 
 function _checkRequired(value, opts, res, next) {
