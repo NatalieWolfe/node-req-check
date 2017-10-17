@@ -119,7 +119,46 @@ tap.test('req-check', (t) => {
   });
 
 
-  t.test('int');
+  t.test('int', (t) => {
+    basicChecks(t, check.int);
+
+    const ware = check.int({name: 'foo', min: 3, max: 6});
+    const next = sinon.spy();
+    const req = {method: 'get', query: {foo: '3'}};
+    const res = {write: sinon.spy(), end: sinon.spy()};
+
+    t.comment('minimum value');
+    ware(req, res, next);
+    t.ok(next.calledOnce, 'should call next');
+    t.equal(req.query.foo, 3, 'should parse the value');
+
+    t.comment('maximum value');
+    next.reset();
+    req.query.foo = '6';
+    ware(req, res, next);
+    t.ok(next.calledOnce, 'should call next');
+    t.equal(req.query.foo, 6, 'should parse the value');
+
+    t.comment('too small a value');
+    next.reset();
+    req.query.foo = '0';
+    ware(req, res, next);
+    t.ok(next.notCalled, 'should not call next');
+    t.ok(res.write.calledOnce, 'should write to the response');
+    t.ok(res.end.calledOnce, 'should end the response');
+
+    t.comment('too large a value');
+    next.reset();
+    res.write.reset();
+    res.end.reset();
+    req.query.foo = '50';
+    ware(req, res, next);
+    t.ok(next.notCalled, 'should not call next');
+    t.ok(res.write.calledOnce, 'should write to the response');
+    t.ok(res.end.calledOnce, 'should end the response');
+
+    t.end();
+  });
 });
 
 function basicChecks(t, check) {
