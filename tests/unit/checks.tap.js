@@ -50,8 +50,31 @@ tap.test('req-check', (t) => {
     t.end();
   });
 
-  t.test('email');
+  t.test('email', (t) => {
+    basicChecks(t, check.email);
+
+    const ware = check.email({name: 'foo'});
+    const next = sinon.spy();
+    const req = {method: 'get', query: {foo: 'bar@baz.com'}};
+    const res = {write: sinon.spy(), end: sinon.spy()};
+
+    t.comment('valid email');
+    ware(req, res, next);
+    t.ok(next.calledOnce, 'should call next');
+
+    t.comment('invalid email');
+    next.reset();
+    req.query.foo = 'nogood';
+    ware(req, res, next);
+    t.ok(next.notCalled, 'should not call next');
+    t.ok(res.write.calledOnce, 'should write to the response');
+    t.ok(res.end.calledOnce, 'should end the response');
+
+    t.end();
+  });
+
   t.test('array');
+  t.test('int');
 });
 
 function basicChecks(t, check) {
