@@ -73,7 +73,52 @@ tap.test('req-check', (t) => {
     t.end();
   });
 
-  t.test('array');
+  t.test('array', (t) => {
+    basicChecks(t, check.array);
+
+    const ware = check.array({name: 'foo', min: 3, max: 6});
+    const next = sinon.spy();
+    const req = {method: 'get', query: {foo: 'foo,bar,baz'}};
+    const res = {write: sinon.spy(), end: sinon.spy()};
+
+    t.comment('minimum value');
+    ware(req, res, next);
+    t.ok(next.calledOnce, 'should call next');
+    t.deepEqual(req.query.foo, ['foo', 'bar', 'baz'], 'should parse the value');
+
+    t.comment('maximum value');
+    next.reset();
+    req.query.foo = 'foo,bar,baz,fizz,bang,boof';
+    ware(req, res, next);
+    t.ok(next.calledOnce, 'should call next');
+    t.deepEqual(
+      req.query.foo,
+      ['foo', 'bar', 'baz', 'fizz', 'bang', 'boof'],
+      'should parse the value'
+    );
+
+    t.comment('too small a value');
+    next.reset();
+    req.query.foo = 'a';
+    ware(req, res, next);
+    t.ok(next.notCalled, 'should not call next');
+    t.ok(res.write.calledOnce, 'should write to the response');
+    t.ok(res.end.calledOnce, 'should end the response');
+
+    t.comment('too large a value');
+    next.reset();
+    res.write.reset();
+    res.end.reset();
+    req.query.foo = 'foo,bar,baz,fizz,bang,boof,biff';
+    ware(req, res, next);
+    t.ok(next.notCalled, 'should not call next');
+    t.ok(res.write.calledOnce, 'should write to the response');
+    t.ok(res.end.calledOnce, 'should end the response');
+
+    t.end();
+  });
+
+
   t.test('int');
 });
 

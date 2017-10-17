@@ -9,6 +9,7 @@ exports.config = config;
 exports.string = string;
 exports.email = email;
 exports.array = array;
+exports.int = int;
 
 
 function config() {
@@ -31,7 +32,7 @@ function string(opts) {
     if (typeof value !== 'string') {
       return errors.invalidParam(opts.name, 'a string', res, next);
     }
-    if (!_checkLength(value, opts, res, next)) {
+    if (!_checkMinMax(value.length, opts, res, next)) {
       return;
     }
     next();
@@ -40,7 +41,7 @@ function string(opts) {
 
 function email(opts) {
   _setDefaults(opts, {
-    required: false,
+    required: false
   });
 
   return function checkEmail(req, res, next) {
@@ -64,7 +65,7 @@ function array(opts) {
     max: Infinity
   });
 
-  return function checkString(req, res, next) {
+  return function checkArray(req, res, next) {
     const params = _getParams(req);
     let value = params[opts.name];
     if (!_checkRequired(value, opts, res, next)) {
@@ -76,7 +77,35 @@ function array(opts) {
     if (!Array.isArray(value)) {
       return errors.invalidParam(opts.name, 'an array', res, next);
     }
-    if (!_checkLength(value, opts, res, next)) {
+    if (!_checkMinMax(value.length, opts, res, next)) {
+      return;
+    }
+    params[opts.name] = value;
+    next();
+  };
+}
+
+function int(opts) {
+  _setDefaults(opts, {
+    radix: 10,
+    required: false,
+    min: -Infinity,
+    max: Infinity
+  });
+
+  return function checkNumber(req, res, next) {
+    const params = _getParams(req);
+    let value = params[opts.name];
+    if (!_checkRequired(value, opts, res, next)) {
+      return;
+    }
+    if (typeof value === 'string') {
+      value = parseInt(value, opts.radix);
+    }
+    if (isNaN(value)) {
+      return errors.invalidParam(opts.name, 'an integer', res, next);
+    }
+    if (!_checkMinMax(value, opts, res, next)) {
       return;
     }
     params[opts.name] = value;
@@ -107,8 +136,8 @@ function _checkRequired(value, opts, res, next) {
   return true;
 }
 
-function _checkLength(value, opts, res, next) {
-  if (value.length < opts.min || value.length > opts.max) {
+function _checkMinMax(value, opts, res, next) {
+  if (value < opts.min || value > opts.max) {
     errors.invalidParam(opts.name, 'between ' + opts.min + ' and ' + opts.max, res, next);
     return false;
   }
