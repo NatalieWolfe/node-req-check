@@ -1,6 +1,6 @@
 {
   "name": "req-check",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Req body and query parameter validation.",
   "main": "index.js",
   "scripts": {
