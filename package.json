@@ -1,0 +1,36 @@
+{
+  "name": "req-check",
+  "version": "0.0.0",
+  "description": "Req body and query parameter validation.",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint *.js lib tests",
+    "unit": "tap tests/unit/*.tap.js tests/unit/**/*.tap.js",
+    "test": "tap tests/**/*.tap.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NatalieWolfe/node-req-check.git"
+  },
+  "keywords": [
+    "req",
+    "validation",
+    "validator",
+    "param",
+    "restify",
+    "express",
+    "query",
+    "body"
+  ],
+  "author": "Natalie Wolfe <natalie@lifewanted.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NatalieWolfe/node-req-check/issues"
+  },
+  "homepage": "https://github.com/NatalieWolfe/node-req-check#readme",
+  "devDependencies": {
+    "eslint": "^4.8.0",
+    "sinon": "^4.0.1",
+    "tap": "^10.7.2"
+  }
+}
