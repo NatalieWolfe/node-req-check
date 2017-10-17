@@ -110,6 +110,7 @@ function _checkRequired(value, opts, res, next) {
 function _checkLength(value, opts, res, next) {
   if (value.length < opts.min || value.length > opts.max) {
     errors.invalidParam(opts.name, 'between ' + opts.min + ' and ' + opts.max, res, next);
+    return false;
   }
   return true;
 }
